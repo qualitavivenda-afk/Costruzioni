@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Check List - Verifica Documentale Cantiere"/>
+<title>Check List - Verifica Documentale Cantiere</title>
+<meta name="theme-color" content="#003C80"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+
+<style>
+:root{--navy:#003C80;--navy-lt:#e8eef7;--green:#2e7d32;--green-lt:#e8f5e9;--red:#c62828;--red-lt:#ffebee;--amber:#e65100;--amber-lt:#fff3e0;--border:#dee2e6;--text:#1a1a2e;--muted:#6c757d;--bg:#f0f2f5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+.app{max-width:600px;margin:0 auto;padding:0 0 24px}
+.hdr{background:var(--navy);color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hdr-title{font-size:14px;font-weight:700;line-height:1.3}
+.hdr-sub{font-size:11px;opacity:.7;margin-top:1px}
+.nav{display:flex;gap:4px}
+.nb{border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:5px 11px;font-size:12px;cursor:pointer;background:transparent;color:#fff;font-weight:600}
+.nb.on{background:#fff;color:var(--navy)}
+.meta{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mf label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px}
+.mf input{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;width:100%;background:#fafafa;color:var(--text)}
+.mf input:focus{outline:none;border-color:var(--navy)}
+.kpis{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kpi{background:#f5f5f5;border-radius:8px;padding:8px 6px;text-align:center}
+.kpi.kg{background:var(--green-lt)}.kpi.kr{background:var(--red-lt)}
+.kpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+.kpi-v{font-size:18px;font-weight:800;margin-top:2px;color:var(--text)}
+.kpi.kg .kpi-v{color:var(--green)}.kpi.kr .kpi-v{color:var(--red)}
+.bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.bar-txt{font-size:12px;color:var(--muted);line-height:1.5}
+.bar-txt strong{color:var(--text);font-size:13px}
+.pill-nc{display:inline-block;background:var(--amber-lt);border:1px solid #ffcc80;border-radius:20px;padding:2px 8px;font-size:11px;color:var(--amber);font-weight:700;margin-top:4px}
+.btn-p{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-p:hover{background:#002a5e}
+.btn-s{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer}
+.errbox{margin:0 10px 10px;background:var(--red-lt);border:1px solid #ef9a9a;border-radius:8px;padding:12px 14px;font-size:12px;color:var(--red)}
+.errbox ul{padding-left:16px;margin-top:6px}
+.errbox li{margin-bottom:3px}
+.secs{padding:0 10px;display:flex;flex-direction:column;gap:8px}
+.sec{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;border-bottom:1px solid transparent}
+.sec-hdr.open{border-bottom-color:var(--border)}
+.sec-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.sec-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.sec-code{font-size:10px;color:var(--muted);margin-top:1px}
+.tog{border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;background:#f5f5f5;cursor:pointer;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;border-radius:5px;padding:3px 7px;font-size:10px;font-weight:800;letter-spacing:.4px;border:1px solid;white-space:nowrap;flex-shrink:0}
+.b-prp{background:#e3f2fd;color:#0d47a1;border-color:#90caf9}
+.b-ccp{background:#fff8e1;color:#e65100;border-color:#ffe082}
+.b-trc{background:#f3e5f5;color:#6a1b9a;border-color:#ce93d8}
+.b-sub{background:#e0f2f1;color:#00695c;border-color:#80cbc4}
+.b-nc{background:var(--red-lt);color:var(--red);border-color:#ef9a9a}
+.b-item{background:#f5f5f5;color:var(--muted);border-color:var(--border);font-size:11px}
+.items{padding:8px 10px 10px}
+.item{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;background:#fff}
+.item.crit{border-color:#ef9a9a;background:var(--red-lt)}
+.item.warn{border-color:#ffe082;background:var(--amber-lt)}
+.item-toprow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.item-badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.chk{border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;background:#fff;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.chk:active{transform:scale(.97)}
+.chk.on{background:var(--green-lt);border-color:var(--green);color:var(--green)}
+.item-text{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:10px}
+.note-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.note-warnlbl{color:var(--amber);font-size:11px;font-weight:700}
+input.dato,textarea{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px;width:100%;resize:vertical;font-family:inherit;background:#fafafa;color:var(--text);line-height:1.5}
+input.dato{min-height:auto}
+textarea{min-height:56px}
+input.dato:focus,textarea:focus{outline:none;border-color:var(--navy);background:#fff}
+input.dato.tw,textarea.tw{border-color:#ffb300!important}
+.sum-wrap{padding:0 10px;margin-top:10px}
+.sum-sec{border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:7px;background:#fff}
+.sum-sec.crit{border-color:#ef9a9a;background:var(--red-lt)}
+.sum-sec.warn{border-color:#ffe082;background:var(--amber-lt)}
+.sum-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.sum-mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sm-item .l{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.sm-item .v{font-size:16px;font-weight:800}
+.tr{color:var(--red)}.ta{color:var(--amber)}.tg{color:var(--green)}
+.verdict{background:var(--navy-lt);border-left:4px solid var(--navy);border-radius:6px;padding:10px 12px;font-size:13px;margin-top:10px}
+.verdict .l{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.verdict .v{font-weight:800;font-size:14px}
+.rep-wrap{padding:0 10px;margin-top:10px}
+.rep-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px}
+.rep-hdr{border-bottom:3px solid var(--navy);padding-bottom:12px;margin-bottom:14px}
+.rep-ht{font-size:16px;font-weight:800;color:var(--navy)}
+.rep-hs{font-size:11px;color:var(--muted);margin-top:3px}
+.rep-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+.rkpi{background:#f5f5f5;border-radius:8px;padding:10px 8px;text-align:center}
+.rkpi .l{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.rkpi .v{font-size:20px;font-weight:800;margin-top:2px}
+.rkpi.kr{background:var(--red-lt)}.rkpi.kr .v{color:var(--red)}
+.rep-verdict{background:var(--navy-lt);border-left:4px solid var(--navy);border-radius:4px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+.rep-stitle{font-size:13px;font-weight:800;color:var(--navy);margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--navy-lt);color:var(--navy);padding:7px 8px;text-align:left;font-weight:800;font-size:10px;text-transform:uppercase}
+td{padding:8px;border-top:1px solid var(--border);font-size:12px}
+tr:nth-child(even) td{background:#fafafa}
+.nc-card{border:1px solid #ef9a9a;border-radius:9px;padding:10px 12px;background:var(--red-lt);margin-bottom:7px}
+.nc-card.prp{border-color:#ffe082;background:var(--amber-lt)}
+.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.sign-box{border:1px solid var(--border);border-radius:9px;padding:12px}
+.sign-box .l{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.sign-line{border-top:1px solid var(--border);margin-top:40px}
+.photo-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.photo-btn{border:1px dashed var(--border);border-radius:8px;padding:8px 12px;font-size:12px;background:#fafafa;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.photo-btn:active{background:#f0f0f0}
+.photo-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);flex-shrink:0}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;cursor:pointer;padding:0}
+.rep-gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rep-photo{width:100%;border-radius:8px;border:1px solid var(--border);display:block;object-fit:cover;aspect-ratio:4/3}
+.rep-photo-cap{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+@media print{.photo-btn{display:none!important}}
+@media print{
+  .nb,.tog,.btn-p,.btn-s{display:none!important}
+  .hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .item{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+var SECS=[
+  {c:"ANA",t:"Anagrafica e Contratto d'Appalto",tp:"ANA",o:1,items:[
+    {n:1,tx:"Nominativo cantiere e indirizzo"},
+    {n:2,tx:"Contratto d'appalto: committente, CIG e data inizio lavori"},
+    {n:3,tx:"Cartellone di cantiere: presenza e corrispondenza tipologia lavori indicata"},
+  ]},
+  {c:"FIG",t:"Figure di Cantiere",tp:"FIG",o:2,items:[
+    {n:4,tx:"Nomina Direttore di Cantiere"},
+    {n:5,tx:"Nomina Direttore dei Lavori"},
+    {n:6,tx:"Nomina Responsabile dei Lavori"},
+    {n:7,tx:"Nomina Capo Cantiere"},
+    {n:8,tx:"Nomina RSPP e/o Preposto/Coordinatore Sicurezza"},
+  ]},
+  {c:"SIC_DOC",t:"Sicurezza - Documentazione Generale",tp:"SIC",o:3,items:[
+    {n:9,tx:"Dichiarazione del personale di cantiere"},
+    {n:10,tx:"POS - Piano Operativo di Sicurezza: presenza, data e revisione aggiornate",crit:true},
+    {n:11,tx:"DVR - Documento di Valutazione dei Rischi: data edizione/revisione, medico competente e RSPP indicati",crit:true},
+    {n:12,tx:"PSC - Piano di Sicurezza e Coordinamento: tipologia, committente, coordinatore progettazione, direttore tecnico ed edizione",crit:true},
+  ]},
+  {c:"SIC_PERS",t:"Sicurezza - Personale",tp:"SIC",o:4,items:[
+    {n:13,tx:"Nominativi lavoratori presenti in cantiere (min. 2)"},
+    {n:14,tx:"Attestati formazione sicurezza: modulo e data per ciascun lavoratore"},
+    {n:15,tx:"Attestati formazione primo soccorso: modulo e data per ciascun lavoratore"},
+    {n:16,tx:"Moduli di consegna DPI ai lavoratori"},
+    {n:17,tx:"Giudizio di idoneità sanitaria dei lavoratori",crit:true},
+  ]},
+  {c:"SUB",t:"Subappalti",tp:"SUB",o:5,items:[
+    {n:18,tx:"Presenza subappalti ed elenco imprese subappaltatrici"},
+    {n:19,tx:"Presenza POS delle imprese subappaltatrici"},
+    {n:20,tx:"Verifica responsabili impresa subappaltatrice (Capo Cantiere, RSPP, Medico Competente, RLS)"},
+    {n:21,tx:"Giudizio di idoneità sanitaria dei lavoratori in subappalto",crit:true},
+  ]},
+  {c:"DOT",t:"Dotazioni di Sicurezza in Cantiere",tp:"SIC",o:6,items:[
+    {n:22,tx:"Presenza cassetta di Primo Soccorso e verifica scadenza contenuto",crit:true},
+    {n:23,tx:"Numero e conformità bagni chimici presenti"},
+    {n:24,tx:"Presenza estintori e verifica tagliando di controllo",crit:true},
+  ]},
+  {c:"TEC",t:"Documentazione Tecnica e Produttiva",tp:"TEC",o:7,items:[
+    {n:25,tx:"Giornale dei Lavori: presenza e verifica ultima annotazione"},
+    {n:26,tx:"Formulari Identificazione Rifiuti (FIR): numero e completezza"},
+    {n:27,tx:"SAL - Stato Avanzamento Lavori: data e revisione"},
+    {n:28,tx:"Dichiarazione di conformità del quadro elettrico"},
+    {n:29,tx:"Certificazioni armature - calcestruzzo"},
+    {n:30,tx:"Certificazioni armature - ferri di armatura"},
+    {n:31,tx:"Esito prove di laboratorio sulle armature"},
+    {n:32,tx:"Relazione geologica: data e revisione"},
+    {n:33,tx:"Documentazione conferimento terra (formulari/registro)"},
+  ]},
+];
+
+var ALL=[];
+SECS.forEach(function(s){s.items.forEach(function(it){ALL.push({sc:s.c,st:s.t,stp:s.tp,n:it.n,tx:it.tx,crit:s.tp==='SIC'||!!it.crit,k:s.c+'-'+it.n});});});
+
+var S={view:'CL',date:todayISO(),compiler:'',attempted:false,open:{},ans:{},confirmAction:null};
+SECS.forEach(function(s){S.open[s.c]=false;});
+ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photo:null};});
+
+function todayISO(){var d=new Date(),p=function(x){return String(x).padStart(2,'0');};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function fPct(n){return isFinite(n)&&n>0?n.toFixed(1)+'%':'0%';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function lbl(sc,n){return sc+' - '+n;}
+
+function calcStats(){
+  var done=0,missing=0,critMissing=0,photos=0,bm={};
+  ALL.forEach(function(it){
+    var a=S.ans[it.k],ok=a&&a.checked;
+    if(ok)done++;else missing++;
+    if(it.crit&&!ok)critMissing++;
+    if(a&&a.photo)photos++;
+    if(!bm[it.sc]){var sec=null;SECS.forEach(function(s){if(s.c===it.sc)sec=s;});bm[it.sc]={c:it.sc,t:it.st,tp:it.stp,o:sec?sec.o:0,tot:0,done:0,missing:0,critMissing:0,photos:0};}
+    var r=bm[it.sc];r.tot++;if(ok)r.done++;else r.missing++;if(it.crit&&!ok)r.critMissing++;if(a&&a.photo)r.photos++;
+  });
+  var bySec=Object.values(bm).sort(function(a,b){return a.o-b.o;});
+  return{done:done,missing:missing,critMissing:critMissing,photos:photos,pct:ALL.length>0?done/ALL.length*100:0,total:ALL.length,bySec:bySec};
+}
+function validate(){
+  var errs=[];
+  ALL.forEach(function(it){var a=S.ans[it.k];
+    if(!a||!a.checked)errs.push({k:it.k,msg:'Elemento da verificare'});
+  });return errs;
+}
+var BC={ANA:'b-prp',FIG:'b-prp',SIC:'b-ccp',SUB:'b-sub',TEC:'b-trc'};
+
+function secOf(k){return k.substring(0,k.lastIndexOf('-'));}
+
+function render(){
+  var st=calcStats(),errs=validate();
+  var missList=ALL.filter(function(it){return !(S.ans[it.k]&&S.ans[it.k].checked);});
+  var errBySec={};
+  errs.forEach(function(er){var sc=secOf(er.k);errBySec[sc]=(errBySec[sc]||0)+1;});
+  var h='';
+
+  h+='<div class="hdr">';
+  h+='<div><div class="hdr-title">Check List - Verifica Documentale Cantiere</div><div class="hdr-sub">Sicurezza, Qualità e Ambiente - 33 elementi</div></div>';
+  h+='<div class="nav">';
+  [['CL','CL'],['SUM','Riepilogo'],['REP','Report']].forEach(function(x){
+    h+='<button class="nb'+(S.view===x[0]?' on':'')+'" onclick="sv(\''+x[0]+'\')">'+x[1]+'</button>';
+  });
+  h+='</div></div>';
+
+  h+='<div class="meta" style="grid-template-columns:1fr 1fr">';
+  h+='<div class="mf"><label>Data verifica</label><input type="date" value="'+S.date+'" oninput="S.date=this.value"/></div>';
+  h+='<div class="mf"><label>Verificatore</label><input value="'+esc(S.compiler)+'" oninput="S.compiler=this.value"/></div>';
+  h+='</div>';
+
+  if(S.view==='CL'){
+    h+='<div class="bar" style="justify-content:flex-end"><div style="display:flex;gap:6px"><button class="btn-s" onclick="askConfirm(\'conform\')">Segna tutto verificato</button><button class="btn-s" onclick="askConfirm(\'reset\')">Azzera</button><button class="btn-p" onclick="closeCL()">Chiudi</button></div></div>';
+
+    if(S.confirmAction){
+      var ctx=S.confirmAction==='conform'
+        ?{msg:'Segnare tutti i '+ALL.length+' elementi come verificati?',btn:'Si\', segna tutto verificato'}
+        :{msg:'Azzerare tutte le risposte della checklist? Operazione non reversibile.',btn:'Si\', azzera'};
+      h+='<div class="errbox" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">';
+      h+='<span>'+ctx.msg+'</span>';
+      h+='<div style="display:flex;gap:6px"><button class="btn-s" onclick="cancelConfirm()">Annulla</button><button class="btn-p" onclick="doConfirm()">'+ctx.btn+'</button></div>';
+      h+='</div>';
+    }
+
+    if(S.attempted&&errs.length>0){
+      h+='<div class="errbox"><strong>Elementi ancora da verificare ('+errs.length+')</strong><ul>';
+      errs.slice(0,5).forEach(function(er){var it=null;ALL.forEach(function(x){if(x.k===er.k)it=x;});h+='<li>Elemento '+(it?it.n:'')+': '+esc(it?it.tx:'')+'</li>';});
+      if(errs.length>5)h+='<li>...e altri '+(errs.length-5)+' elementi.</li>';
+      h+='</ul></div>';
+    }
+
+    h+='<div class="secs">';
+    SECS.forEach(function(sec){
+      var isOpen=S.open[sec.c];
+      h+='<div class="sec"><div class="sec-hdr'+(isOpen?' open':'')+'" onclick="tog(\''+sec.c+'\')">';
+      h+='<div class="sec-left"><span class="badge '+(BC[sec.tp]||'b-item')+'">'+sec.tp+'</span>';
+      h+='<div><div class="sec-name">'+esc(sec.t)+'</div><div class="sec-code">'+sec.c+'</div></div></div>';
+      if(S.attempted&&errBySec[sec.c])h+='<span class="badge b-nc">'+errBySec[sec.c]+' da verificare</span>';
+      h+='<button class="tog" onclick="event.stopPropagation();tog(\''+sec.c+'\')">'+(isOpen?'Nascondi':'Mostra')+'</button>';
+      h+='</div>';
+      if(isOpen){
+        h+='<div class="items">';
+        sec.items.forEach(function(item){
+          var k=sec.c+'-'+item.n;
+          var a=S.ans[k]||{};var ok=!!a.checked;
+          var isCritSec=sec.tp==='SIC'||!!item.crit;
+          var mE=S.attempted&&!ok;
+          h+='<div id="item-'+k+'" class="item'+(mE&&isCritSec?' crit':mE?' warn':'')+'"><div class="item-toprow"><div class="item-badges">';
+          h+='<span class="badge b-item">'+lbl(sec.c,item.n)+'</span>';
+          if(isCritSec)h+='<span class="badge b-ccp">CRITICO</span>';
+          h+='</div>';
+          h+='<button class="chk'+(ok?' on':'')+'" onclick="setChk(\''+k+'\',!'+(ok?'true':'false')+')">'+(ok?'\u2713 Verificato':'Da verificare')+'</button>';
+          h+='</div>';
+          h+='<div class="item-text">'+esc(item.tx)+'</div>';
+          h+='<div><div class="note-lbl"><span>Dato / Riferimento</span>';
+          if(mE)h+='<span class="note-warnlbl">Da verificare</span>';
+          h+='</div><input class="dato'+(mE?' tw':'')+'" oninput="setN(\''+k+'\',this.value)" placeholder="Es. nominativo, data, protocollo, rev., scadenza..." value="'+esc(a.note||'')+'"/></div>';
+          h+='<div class="photo-row">';
+          if(a.photo){
+            h+='<div class="photo-thumb"><img src="'+a.photo+'"/><button class="photo-rm" onclick="rmPhoto(\''+k+'\')">\u00d7</button></div>';
+          }
+          h+='<label class="photo-btn">\ud83d\udcf7 '+(a.photo?'Sostituisci foto':'Scatta / allega foto')+'<input type="file" accept="image/*" capture="environment" style="display:none" onchange="setPhoto(\''+k+'\',this)"/></label>';
+          h+='</div>';
+          h+='</div>';
+        });
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+
+  if(S.view==='SUM'){
+    h+='<div class="bar" style="margin-bottom:10px;justify-content:flex-end"><div style="display:flex;gap:6px"><button class="btn-s" onclick="sv(\'CL\')">Checklist</button><button class="btn-p" onclick="sv(\'REP\')">Report</button></div></div>';
+    h+='<div class="sum-wrap">';
+    st.bySec.forEach(function(s){
+      var p=s.tot>0?s.done/s.tot*100:0;
+      var esito=s.critMissing>0?'Da completare (critico)':s.missing>0?'Da completare':'Completo';
+      h+='<div class="sum-sec'+(s.critMissing>0?' crit':s.missing>0?' warn':'')+'"><div class="sum-row"><span class="badge '+(BC[s.tp]||'b-item')+'">'+s.tp+'</span><strong style="font-size:13px">'+esc(s.t)+'</strong></div>';
+      h+='<div class="sum-mini"><div class="sm-item"><div class="l">Elem.</div><div class="v">'+s.tot+'</div></div><div class="sm-item"><div class="l">Da verif.</div><div class="v'+(s.missing>0?' tr':'')+'">'+s.missing+'</div></div><div class="sm-item"><div class="l">Compl.</div><div class="v">'+fPct(p)+'</div></div></div>';
+      h+='<div style="margin-top:7px;font-size:12px">Stato: <strong class="'+(s.critMissing>0?'tr':s.missing>0?'ta':'tg')+'">'+esito+'</strong>'+(s.photos>0?' &middot; \ud83d\udcf7 '+s.photos+' foto':'')+'</div></div>';
+    });
+    h+='<div class="verdict"><div class="l">Stato complessivo verifica</div><div class="v '+(st.critMissing>0?'tr':st.missing>0?'ta':'tg')+'">'+(st.critMissing>0?'Da completare - mancano elementi critici di sicurezza':st.missing>0?'Verifica parziale - elementi ancora da controllare':'Verifica completa')+'</div></div></div>';
+  }
+
+  if(S.view==='REP'){
+    h+='<div class="rep-wrap"><div class="rep-card"><div class="rep-hdr">';
+    h+='<div class="rep-ht">Report di Verifica Documentale Cantiere</div>';
+    h+='<div class="rep-hs">Check List Documentazione Cantiere - 33 elementi</div>';
+    h+='<div class="rep-hs" style="margin-top:4px">'+(S.ans['ANA-1']&&S.ans['ANA-1'].note?esc(S.ans['ANA-1'].note)+' - ':'')+S.date+' - '+esc(S.compiler)+'</div>';
+    h+='<div style="display:flex;gap:6px;margin-top:10px"><button class="btn-s" onclick="window.print()">Stampa / PDF</button><button class="btn-p" onclick="sv(\'SUM\')">Chiudi</button></div></div>';
+    h+='<div class="rep-kpis"><div class="rkpi"><div class="l">Totale elementi</div><div class="v">'+st.total+'</div></div><div class="rkpi"><div class="l">Completamento</div><div class="v">'+fPct(st.pct)+'</div></div><div class="rkpi'+(st.critMissing>0?' kr':'')+'"><div class="l">Critici mancanti</div><div class="v">'+st.critMissing+'</div></div></div>';
+    h+='<div style="font-size:12px;color:var(--muted);margin-bottom:10px">\ud83d\udcf7 Foto allegate: <strong style="color:var(--text)">'+st.photos+'</strong></div>';
+    h+='<div class="rep-verdict">Stato: <strong class="'+(st.critMissing>0?'tr':st.missing>0?'ta':'tg')+'">'+(st.critMissing>0?'Da completare - mancano elementi critici di sicurezza':st.missing>0?'Verifica parziale':'Verifica completa')+'</strong></div>';
+    h+='<div class="rep-stitle">Riepilogo per sezione</div><div style="overflow-x:auto"><table><thead><tr><th>Sezione</th><th>Tipo</th><th>Tot</th><th>Da verif.</th><th>Compl.%</th><th>Stato</th></tr></thead><tbody>';
+    st.bySec.forEach(function(s){
+      var p=s.tot>0?s.done/s.tot*100:0;
+      var esito=s.critMissing>0?'Da compl.(critico)':s.missing>0?'Da compl.':'Completo';
+      h+='<tr><td>'+esc(s.t)+'</td><td><span class="badge '+(BC[s.tp]||'b-item')+'">'+s.tp+'</span></td><td>'+s.tot+'</td><td class="'+(s.missing>0?'tr':'')+'">'+s.missing+'</td><td>'+fPct(p)+'</td><td class="'+(s.critMissing>0?'tr':s.missing>0?'ta':'tg')+'">'+esito+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="rep-stitle">Elenco dati raccolti</div><div style="overflow-x:auto"><table><thead><tr><th>Elem.</th><th>Voce</th><th>Dato / Riferimento</th></tr></thead><tbody>';
+    ALL.forEach(function(it){
+      var a=S.ans[it.k];
+      h+='<tr><td>'+it.n+'</td><td>'+esc(it.tx)+'</td><td>'+(a&&a.note?esc(a.note):'<span style="color:var(--muted)">---</span>')+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<div class="rep-stitle">Foto allegate</div>';
+    var photoItems=ALL.filter(function(it){return S.ans[it.k]&&S.ans[it.k].photo;});
+    if(photoItems.length===0){
+      h+='<div style="font-size:12px;color:var(--muted)">Nessuna foto allegata.</div>';
+    } else {
+      h+='<div class="rep-gallery">';
+      photoItems.forEach(function(it){
+        h+='<div><img class="rep-photo" src="'+S.ans[it.k].photo+'"/><div class="rep-photo-cap">Elem. '+it.n+' - '+esc(it.tx)+'</div></div>';
+      });
+      h+='</div>';
+    }
+    h+='<div class="rep-stitle">Elementi ancora da verificare</div>';
+    if(missList.length===0){
+      h+='<div style="background:var(--green-lt);border:1px solid #a5d6a7;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--green)"><strong>Nessun elemento mancante: verifica completa.</strong></div>';
+    } else {
+      missList.forEach(function(x){
+        h+='<div class="nc-card'+(x.crit?'':' prp')+'"><div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap">';
+        h+='<span class="badge b-item">Elem. '+x.n+'</span><span class="badge '+(BC[x.stp]||'b-item')+'">'+x.stp+'</span>';
+        if(x.crit)h+='<span class="badge b-nc">Critico</span>';
+        h+='</div><div style="font-size:13px;line-height:1.6">'+esc(x.tx)+'</div></div>';
+      });
+    }
+    var hasCritMiss=missList.some(function(x){return x.crit;});
+    if(hasCritMiss)h+='<div style="background:var(--red-lt);border-left:4px solid var(--red);border-radius:4px;padding:10px 12px;margin-top:8px;font-size:12px;color:var(--red)"><strong>Attenzione:</strong> completare la verifica degli elementi critici di sicurezza prima della prosecuzione dei lavori.</div>';
+    h+='</div></div><div style="text-align:center;font-size:10px;color:var(--muted);margin-top:8px;padding-bottom:4px">Sistema Qualità e Sicurezza - Check List Verifica Documentale Cantiere</div>';
+  }
+
+  document.getElementById('app').innerHTML=h;
+}
+
+function sv(v){S.view=v;render();}
+function askConfirm(action){S.confirmAction=action;render();}
+function cancelConfirm(){S.confirmAction=null;render();}
+function doConfirm(){
+  if(S.confirmAction==='conform'){
+    ALL.forEach(function(it){S.ans[it.k].checked=true;});
+  } else if(S.confirmAction==='reset'){
+    ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photo:null};});
+    S.attempted=false;
+  }
+  S.confirmAction=null;
+  render();
+}
+function tog(c){S.open[c]=!S.open[c];render();}
+function setChk(k,v){S.ans[k].checked=v;render();}
+function setN(k,v){S.ans[k].note=v;}
+function setPhoto(k,inputEl){
+  var file=inputEl.files&&inputEl.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){S.ans[k].photo=e.target.result;render();};
+  reader.readAsDataURL(file);
+}
+function rmPhoto(k){S.ans[k].photo=null;render();}
+function closeCL(){
+  S.attempted=true;
+  var errs=validate();
+  if(errs.length===0){S.view='SUM';render();}
+  else{
+    errs.forEach(function(er){S.open[secOf(er.k)]=true;});
+    render();
+    setTimeout(function(){var el=document.getElementById('item-'+errs[0].k);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},50);
+  }
+}
+render();
+</script>
+</body>
+</html>
