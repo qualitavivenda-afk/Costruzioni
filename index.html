@@ -187,7 +187,7 @@ SECS.forEach(function(s){s.items.forEach(function(it){ALL.push({sc:s.c,st:s.t,st
 
 var S={view:'CL',date:todayISO(),compiler:'',attempted:false,open:{},ans:{},confirmAction:null};
 SECS.forEach(function(s){S.open[s.c]=false;});
-ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photo:null};});
+ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photos:[]};});
 
 function todayISO(){var d=new Date(),p=function(x){return String(x).padStart(2,'0');};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
 function fPct(n){return isFinite(n)&&n>0?n.toFixed(1)+'%':'0%';}
@@ -200,9 +200,9 @@ function calcStats(){
     var a=S.ans[it.k],ok=a&&a.checked;
     if(ok)done++;else missing++;
     if(it.crit&&!ok)critMissing++;
-    if(a&&a.photo)photos++;
+    if(a&&a.photos)photos+=a.photos.length;
     if(!bm[it.sc]){var sec=null;SECS.forEach(function(s){if(s.c===it.sc)sec=s;});bm[it.sc]={c:it.sc,t:it.st,tp:it.stp,o:sec?sec.o:0,tot:0,done:0,missing:0,critMissing:0,photos:0};}
-    var r=bm[it.sc];r.tot++;if(ok)r.done++;else r.missing++;if(it.crit&&!ok)r.critMissing++;if(a&&a.photo)r.photos++;
+    var r=bm[it.sc];r.tot++;if(ok)r.done++;else r.missing++;if(it.crit&&!ok)r.critMissing++;if(a&&a.photos)r.photos+=a.photos.length;
   });
   var bySec=Object.values(bm).sort(function(a,b){return a.o-b.o;});
   return{done:done,missing:missing,critMissing:critMissing,photos:photos,pct:ALL.length>0?done/ALL.length*100:0,total:ALL.length,bySec:bySec};
@@ -284,10 +284,11 @@ function render(){
           if(mE)h+='<span class="note-warnlbl">Da verificare</span>';
           h+='</div><input class="dato'+(mE?' tw':'')+'" oninput="setN(\''+k+'\',this.value)" placeholder="Es. nominativo, data, protocollo, rev., scadenza..." value="'+esc(a.note||'')+'"/></div>';
           h+='<div class="photo-row">';
-          if(a.photo){
-            h+='<div class="photo-thumb"><img src="'+a.photo+'"/><button class="photo-rm" onclick="rmPhoto(\''+k+'\')">\u00d7</button></div>';
-          }
-          h+='<label class="photo-btn">\ud83d\udcf7 '+(a.photo?'Sostituisci foto':'Scatta / allega foto')+'<input type="file" accept="image/*" capture="environment" style="display:none" onchange="setPhoto(\''+k+'\',this)"/></label>';
+          var ph=a.photos||[];
+          ph.forEach(function(src,i){
+            h+='<div class="photo-thumb"><img src="'+src+'"/><button class="photo-rm" onclick="rmPhoto(\''+k+'\','+i+')">\u00d7</button></div>';
+          });
+          h+='<label class="photo-btn">\ud83d\udcf7 '+(ph.length?'Aggiungi altra foto ('+ph.length+')':'Scatta / allega foto')+'<input type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="setPhoto(\''+k+'\',this)"/></label>';
           h+='</div>';
           h+='</div>';
         });
@@ -340,13 +341,16 @@ function render(){
       h+='</tbody></table></div></div>';
     });
     h+='<div class="rep-stitle">Foto allegate</div>';
-    var photoItems=ALL.filter(function(it){return S.ans[it.k]&&S.ans[it.k].photo;});
+    var photoItems=ALL.filter(function(it){return S.ans[it.k]&&S.ans[it.k].photos&&S.ans[it.k].photos.length;});
     if(photoItems.length===0){
       h+='<div style="font-size:12px;color:var(--muted)">Nessuna foto allegata.</div>';
     } else {
       h+='<div class="rep-gallery">';
       photoItems.forEach(function(it){
-        h+='<div class="rep-item"><img class="rep-photo" src="'+S.ans[it.k].photo+'"/><div class="rep-photo-cap">Elem. '+it.n+' - '+esc(it.tx)+'</div></div>';
+        var ps=S.ans[it.k].photos;
+        ps.forEach(function(src,i){
+          h+='<div class="rep-item"><img class="rep-photo" src="'+src+'"/><div class="rep-photo-cap">Elem. '+it.n+' - '+esc(it.tx)+(ps.length>1?' (foto '+(i+1)+'/'+ps.length+')':'')+'</div></div>';
+        });
       });
       h+='</div>';
     }
@@ -376,7 +380,7 @@ function doConfirm(){
   if(S.confirmAction==='conform'){
     ALL.forEach(function(it){S.ans[it.k].checked=true;});
   } else if(S.confirmAction==='reset'){
-    ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photo:null};});
+    ALL.forEach(function(it){S.ans[it.k]={checked:false,note:'',photos:[]};});
     S.attempted=false;
   }
   S.confirmAction=null;
@@ -386,13 +390,21 @@ function tog(c){S.open[c]=!S.open[c];render();}
 function setChk(k,v){S.ans[k].checked=v;render();}
 function setN(k,v){S.ans[k].note=v;}
 function setPhoto(k,inputEl){
-  var file=inputEl.files&&inputEl.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){S.ans[k].photo=e.target.result;render();};
-  reader.readAsDataURL(file);
+  var files=Array.prototype.slice.call(inputEl.files||[]);
+  if(!files.length)return;
+  var left=files.length;
+  files.forEach(function(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      if(!S.ans[k].photos)S.ans[k].photos=[];
+      S.ans[k].photos.push(e.target.result);
+      if(--left===0)render();
+    };
+    reader.onerror=function(){if(--left===0)render();};
+    reader.readAsDataURL(file);
+  });
 }
-function rmPhoto(k){S.ans[k].photo=null;render();}
+function rmPhoto(k,i){S.ans[k].photos.splice(i,1);render();}
 function closeCL(){
   S.attempted=true;
   var errs=validate();
