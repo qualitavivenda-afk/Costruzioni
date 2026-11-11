@@ -112,9 +112,16 @@ tr:nth-child(even) td{background:#fafafa}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .photo-rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;cursor:pointer;padding:0}
 .rep-gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.rep-photo{width:100%;border-radius:8px;border:1px solid var(--border);display:block;object-fit:cover;aspect-ratio:4/3}
+.rep-photo{width:100%;height:auto;max-height:420px;border-radius:8px;border:1px solid var(--border);display:block;object-fit:contain;background:#f5f5f5}
+.rep-item{break-inside:avoid;page-break-inside:avoid;-webkit-column-break-inside:avoid}
 .rep-photo-cap{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
-@media print{.photo-btn{display:none!important}}
+@media print{.photo-btn{display:none!important}
+  .rep-gallery{display:block}
+  .rep-item{display:inline-block;vertical-align:top;width:48.5%;margin:0 1% 12px 0;break-inside:avoid;page-break-inside:avoid}
+  .rep-photo{max-height:9cm}
+  .rep-stitle{break-after:avoid;page-break-after:avoid}
+  .nc-card,tr,.rkpi{break-inside:avoid;page-break-inside:avoid}
+}
 @media print{
   .nb,.tog,.btn-p,.btn-s{display:none!important}
   .hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -320,12 +327,18 @@ function render(){
       h+='<tr><td>'+esc(s.t)+'</td><td><span class="badge '+(BC[s.tp]||'b-item')+'">'+s.tp+'</span></td><td>'+s.tot+'</td><td class="'+(s.missing>0?'tr':'')+'">'+s.missing+'</td><td>'+fPct(p)+'</td><td class="'+(s.critMissing>0?'tr':s.missing>0?'ta':'tg')+'">'+esito+'</td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="rep-stitle">Elenco dati raccolti</div><div style="overflow-x:auto"><table><thead><tr><th>Elem.</th><th>Voce</th><th>Dato / Riferimento</th></tr></thead><tbody>';
-    ALL.forEach(function(it){
-      var a=S.ans[it.k];
-      h+='<tr><td>'+it.n+'</td><td>'+esc(it.tx)+'</td><td>'+(a&&a.note?esc(a.note):'<span style="color:var(--muted)">---</span>')+'</td></tr>';
+    h+='<div class="rep-stitle">Elenco dati raccolti per sezione</div>';
+    SECS.forEach(function(sec){
+      var its=ALL.filter(function(it){return it.sc===sec.c;});
+      var nd=its.filter(function(it){return S.ans[it.k]&&S.ans[it.k].checked;}).length;
+      h+='<div class="rep-sec"><div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;flex-wrap:wrap"><span class="badge '+(BC[sec.tp]||'b-item')+'">'+sec.tp+'</span><strong style="font-size:13px">'+esc(sec.t)+'</strong><span style="font-size:11px;color:var(--muted)">'+nd+'/'+its.length+' verificati</span></div>';
+      h+='<div style="overflow-x:auto"><table><thead><tr><th>Elem.</th><th>Voce</th><th>Dato / Riferimento</th><th>Stato</th></tr></thead><tbody>';
+      its.forEach(function(it){
+        var a=S.ans[it.k],ok=a&&a.checked;
+        h+='<tr><td>'+it.n+'</td><td>'+esc(it.tx)+'</td><td>'+(a&&a.note?esc(a.note):'<span style="color:var(--muted)">---</span>')+'</td><td class="'+(ok?'tg':(it.crit?'tr':'ta'))+'" style="white-space:nowrap;font-weight:700">'+(ok?'\u2713 Verificato':'Da verificare')+'</td></tr>';
+      });
+      h+='</tbody></table></div></div>';
     });
-    h+='</tbody></table></div>';
     h+='<div class="rep-stitle">Foto allegate</div>';
     var photoItems=ALL.filter(function(it){return S.ans[it.k]&&S.ans[it.k].photo;});
     if(photoItems.length===0){
@@ -333,7 +346,7 @@ function render(){
     } else {
       h+='<div class="rep-gallery">';
       photoItems.forEach(function(it){
-        h+='<div><img class="rep-photo" src="'+S.ans[it.k].photo+'"/><div class="rep-photo-cap">Elem. '+it.n+' - '+esc(it.tx)+'</div></div>';
+        h+='<div class="rep-item"><img class="rep-photo" src="'+S.ans[it.k].photo+'"/><div class="rep-photo-cap">Elem. '+it.n+' - '+esc(it.tx)+'</div></div>';
       });
       h+='</div>';
     }
